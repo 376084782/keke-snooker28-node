@@ -4,13 +4,15 @@ import { PEOPLE_EACH_GAME_MAX } from "./config";
 import Util from "./Util";
 import ModelUser from "../models/ModelUser";
 
-function encode(str) {
-  // 对字符串进行编码
-  var encode = encodeURI(str);
-  // 对编码的字符串转化base64
-  var base64 = btoa(encode);
-  return base64;
-}
+
+// function encode(str) {
+//   // 对字符串进行编码
+//   var encode = encodeURI(str);
+//   // 对编码的字符串转化base64
+//   var base64 = btoa(encode);
+//   return base64;
+// }
+
 export default class socketManager {
   static isOpen = true;
   static io;
@@ -84,7 +86,7 @@ export default class socketManager {
           type,
           data
         });
-        socket.emit("message", encode(res));
+        socket.emit("message", res);
       }
     });
   }
@@ -186,6 +188,7 @@ export default class socketManager {
         break
       }
       case PROTOCLE.CLIENT.RECONNECT: {
+        console.log('RECONNECT')
         // 检测重连数据
         let dataGame: any = {
           isMatch: data.isMatch
