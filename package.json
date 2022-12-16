@@ -20,7 +20,10 @@
   "dependencies": {
     "@types/node": "^14.14.22",
     "agora-access-token": "^2.0.4",
+<<<<<<< HEAD
     "atob": "^2.1.2",
+=======
+>>>>>>> 5105e125913cbdb7593e8bf739cf2b7d3a41dce9
     "axios": "^0.24.0",
     "babel": "^6.23.0",
     "babel-cli": "^6.24.1",
