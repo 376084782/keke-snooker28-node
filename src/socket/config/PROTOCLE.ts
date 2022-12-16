@@ -1,0 +1,22 @@
+export default class PROTOCLE {
+  static CLIENT = {
+    EXIT: "EXIT",
+    MATCH: "MATCH",
+    RECONNECT: "RECONNECT",
+    PING: "PING",
+    HIT: 'HIT'
+  };
+  static SERVER = {
+    ERROR: "ERROR",
+    PING: "PING",
+    RECONNECT: "RECONNECT",
+    ROOM_USER_UPDATE: "ROOM_USER_UPDATE",
+    UPDATE_USER_INFO: "UPDATE_USER_INFO",
+    GO_GAME: 'GO_GAME',
+    GO_HALL: 'GO_HALL',
+    HOLE_UP: 'HOLE_UP',
+    HOLE_DOWN: 'HOLE_DOWN',
+    HIT_COST: 'HIT_COST',
+    HIT_RESULT: 'HIT_RESULT'
+  };
+}
