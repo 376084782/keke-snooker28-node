@@ -12,6 +12,14 @@ var express = require("express");
 var router = express.Router();
 /* GET home page. */
 
+router.get("/test", async (req, res, next) => {
+  let data = req.query;
+  res.send({
+    code: 0,
+    msg: '测试连接'
+  });
+});
+
 router.post("/userinfo", async (req, res, next) => {
   let data = req.body;
   try {
