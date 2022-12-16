@@ -31,7 +31,8 @@ export const socketPort = 8888;
 // export const KEKE_HOST = "http://13.215.127.139:8003";
 
 // 数据库地址
-export const DBHost = 'mongodb://18.138.131.29:27018/'
+// export const DBHost = 'mongodb://18.138.131.29:27018/'
+export const DBHost = 'mongodb://localhost:27018/'
 // 数据库名
 export const DBName = "keke_snooker";
 // 数据库用户名
