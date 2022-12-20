@@ -155,18 +155,18 @@ export default class RoomManager {
         msg: "玩家已經在房間內"
       });
       return;
+    } else {
+      let blankSeat = this.getBlankSeat();
+      if (blankSeat == 0) {
+        console.log(`房间已满员，${userInfo.uid}无法加入`)
+        socketManager.sendErrByUidList([userInfo.uid], "match", {
+          msg: "房間已滿"
+        });
+        return;
+      }
+      userInfo.seat = blankSeat;
+      this.userList.push(userInfo);
     }
-    let blankSeat = this.getBlankSeat();
-    if (blankSeat == 0) {
-      console.log(`房间已满员，${userInfo.uid}无法加入`)
-      socketManager.sendErrByUidList([userInfo.uid], "match", {
-        msg: "房間已滿"
-      });
-      return;
-    }
-    userInfo.seat = blankSeat;
-    console.log('pushhhh', userInfo)
-    this.userList.push(userInfo);
     this.userList = this.userList.sort((a: any, b: any) => a.seat - b.seat)
     this.checkCanStart();
 
