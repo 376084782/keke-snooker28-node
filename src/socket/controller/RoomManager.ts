@@ -259,10 +259,10 @@ export default class RoomManager {
     });
   }
   config: any;
-  roundId = 0;
+  gameId = 0;
   async doStartGame() {
     await this.initConfig();
-    this.roundId = uuid.v4();
+    this.gameId = uuid.v4();
     this.game.countInRound = this.userList.length;
     this.uidListShowBall = [];
     this.winner = {};
@@ -745,7 +745,7 @@ export default class RoomManager {
       // 二次防止金币扣成负数
       dataUser.coin = 0;
     }
-    API.changeCoin(uid, num, cost_diamond, this.roundId)
+    API.changeCoin(uid, num, cost_diamond, this.game.round)
 
     //let user = this.getUserById(uid);
     //user.coin = dataUser.coin;
