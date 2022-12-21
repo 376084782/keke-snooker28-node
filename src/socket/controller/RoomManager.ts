@@ -6,6 +6,7 @@ import ModelConfigRoom from "../../models/ModelConfigRoom";
 import TrackingManager from "./TrackingManager";
 import ModelUser from "../../models/ModelUser";
 import API from "../../api/API";
+import uuid = require('node-uuid')
 // 游戏内玩家全部离线的房间，自动清除
 export default class RoomManager {
   // 房间等级
@@ -258,8 +259,10 @@ export default class RoomManager {
     });
   }
   config: any;
+  roundId = 0;
   async doStartGame() {
     await this.initConfig();
+    this.roundId = uuid.v4();
     this.game.countInRound = this.userList.length;
     this.uidListShowBall = [];
     this.winner = {};
@@ -688,8 +691,9 @@ export default class RoomManager {
       p = (100 - this.config.percentage) / 100
     }
     for (let uu in winner.mapGain) {
-      winner.mapGain[uu] = Math.floor(winner.mapGain[uu] * p)
-      this.changeMoney(uu, winner.mapGain[uu], 10000);
+      let cc = winner.mapGain[uu]
+      winner.mapGain[uu] = Math.floor(cc * p)
+      this.changeMoney(uu, winner.mapGain[uu], 10000, cc);
     }
     console.log(chipTotalInDesk, winner.mapGain, 'winner.mapGain')
     socketManager.sendMsgByUidList(this.uidListLastRound, "FINISH", {
@@ -724,7 +728,7 @@ export default class RoomManager {
       num
     });
   }
-  async changeMoney(uid, num, tag) {
+  async changeMoney(uid, num, tag, cost_diamond?) {
     // 修改玩家金币
     let dataUser = this.userList.find(e => e.uid == uid);
     if (!dataUser) {
@@ -741,7 +745,7 @@ export default class RoomManager {
       // 二次防止金币扣成负数
       dataUser.coin = 0;
     }
-    API.changeCoin(uid, num)
+    API.changeCoin(uid, num, cost_diamond, this.roundId)
 
     //let user = this.getUserById(uid);
     //user.coin = dataUser.coin;

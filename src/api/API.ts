@@ -24,14 +24,16 @@ export default class API {
   }
   static mapToken = {};
   static mapSSToken = {}
-  static async changeCoin(uid, diamond) {
+  static async changeCoin(uid, diamond, cost_diamond, roundId?) {
     let dataSend = {
       token: this.mapToken[uid],
       ss_token: this.mapSSToken[uid],
       diamond_type: diamond < 0 ? 1 : 2,
       diamond: Math.abs(diamond),
       game_data: {
+        roundId,
         game_id: 2,
+        cost_diamond
       }
     }
     let serverRes: any = await this.doAjax({
