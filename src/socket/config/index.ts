@@ -20,26 +20,26 @@ export const socketPort = 8888;
 
 // 火游测试配置
 
-// // 数据库地址
-// export const DBHost = 'mongodb://39.101.162.107:20017/'
-// // 数据库名
-// export const DBName = "keke_snooker";
-// // 数据库用户名
-// export const DBUser = "root";
-// // 数据库密码
-// export const DBPass = "123456";
-// export const KEKE_HOST = "http://13.215.127.139:8003";
-
 // 数据库地址
-// export const DBHost = 'mongodb://18.138.131.29:27018/'
-export const DBHost = 'mongodb://localhost:27018/'
+export const DBHost = 'mongodb://39.101.162.107:20017/'
 // 数据库名
 export const DBName = "keke_snooker";
 // 数据库用户名
-export const DBUser = "mnaudio";
+export const DBUser = "root";
 // 数据库密码
-export const DBPass = "1s67avLjjK8m";
-export const KEKE_HOST = "http://api.llbibo.com:8003";
+export const DBPass = "123456";
+export const KEKE_HOST = "http://13.215.127.139:8003";
+
+// 数据库地址
+// // export const DBHost = 'mongodb://18.138.131.29:27018/'
+// export const DBHost = 'mongodb://localhost:27018/'
+// // 数据库名
+// export const DBName = "keke_snooker";
+// // 数据库用户名
+// export const DBUser = "mnaudio";
+// // 数据库密码
+// export const DBPass = "1s67avLjjK8m";
+// export const KEKE_HOST = "http://api.llbibo.com:8003";
 
 
 
