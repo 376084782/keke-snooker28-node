@@ -36,7 +36,7 @@ export default class socketManager {
       return (
         roomCtr.level == level &&
         roomCtr.uidList.length < PEOPLE_EACH_GAME_MAX &&
-        roomCtr.step == 0
+        roomCtr.step == 0 || roomCtr.step == 2
       );
     });
     if (!!roomId) {
