@@ -35,10 +35,8 @@ export default class socketManager {
     let list = this.aliveRoomList.filter((roomCtr: RoomManager) => {
       return (
         roomCtr.level == level &&
-        (!roomCtr.game.timeStart ||
-          d < roomCtr.game.timeStart - 3000 ||
-          (d > roomCtr.game.timeStart + 3000 &&
-            roomCtr.uidList.length < PEOPLE_EACH_GAME_MAX))
+        roomCtr.uidList.length < PEOPLE_EACH_GAME_MAX &&
+        roomCtr.step == 0
       );
     });
     if (!!roomId) {
