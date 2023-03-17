@@ -747,9 +747,10 @@ export default class RoomManager {
     }
   }
   changeMoney(uid, num, tag, cost_diamond?) {
-    let game_room_id = this.gameId;
+    let game_room_id = this.roomId
+    let game_round_id = this.gameId;
     return new Promise((rsv) => {
-      API.changeCoin(uid, num, cost_diamond, this.game.round)
+      API.changeCoin(uid, num, cost_diamond, this.game.round, game_room_id, game_round_id)
         .then(async e => {
           await this.updateUserInfoByUid(uid)
           // // 统计盈利情况

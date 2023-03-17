@@ -24,7 +24,7 @@ export default class API {
   }
   static mapToken = {};
   static mapSSToken = {}
-  static async changeCoin(uid, diamond, cost_diamond, roundId?) {
+  static async changeCoin(uid, diamond, cost_diamond, roundId, game_room_id, game_round_id) {
     return new Promise(async (rsv, rej) => {
       let dataSend = {
         token: this.mapToken[uid],
@@ -34,7 +34,9 @@ export default class API {
         game_data: {
           roundId,
           game_id: 2,
-          cost_diamond
+          cost_diamond,
+          game_room_id,
+          game_round_id
         }
       }
       let serverRes: any = await this.doAjax({
