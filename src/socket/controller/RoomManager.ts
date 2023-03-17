@@ -135,16 +135,19 @@ export default class RoomManager {
   timerJoin = {};
   // 玩家加入
   async join(userInfo) {
+    // v2: 每次进⼊房间 更新服务端初始化拉取最新钻⽯剩余
+    let userInfoNew = await socketManager.getUserInfoByUid(userInfo.uid)
+    userInfo.coin = userInfoNew.coin;
     await this.initConfig();
     if (userInfo.coin > this.config.max) {
-      console.log(`${userInfo.uid}金币大于该房间上限，无法加入`)
+      console.log(`${userInfo.uid}鉆石大于该房间上限，无法加入`)
       socketManager.sendErrByUidList([userInfo.uid], "match", {
         msg: "鉆石大於該房間上限"
       });
       return;
     }
     if (userInfo.coin < this.config.min) {
-      console.log(`${userInfo.uid}金币不足，无法加入`)
+      console.log(`${userInfo.uid}鉆石不足，无法加入`)
       socketManager.sendErrByUidList([userInfo.uid], "match", {
         msg: "鉆石不足"
       });
@@ -280,12 +283,12 @@ export default class RoomManager {
 
     console.log('开始游戏，当前游戏中玩家:', this.userListInGame)
     this.userListInGame.forEach(e => {
-      console.log(`${e.uid}当前金币数量:`, e.coin)
+      console.log(`${e.uid}当前鉆石数量:`, e.coin)
     })
     // for (let i = 0; i < this.userListInGame.length; i++) {
     //   let user = this.userListInGame[i];
     //   this.changeMoney(user.uid, -this.config.teaMoney, 30002);
-    //   console.log(`扣除${user.uid}茶水费${this.config.teaMoney}金币`)
+    //   console.log(`扣除${user.uid}茶水费${this.config.teaMoney}鉆石`)
     // }
     // 随机开始座位
     let idxFirstUser = Util.getRandomInt(0, this.userListInGame.length);
@@ -301,7 +304,7 @@ export default class RoomManager {
       for (let i = 0; i < this.userListInGame.length; i++) {
         let user = this.userListInGame[i];
         this.throwMoney(user.uid, this.config.basicChip, 5);
-        console.log(`开始游戏，扣除${user.uid}底注${this.config.basicChip}金币`)
+        console.log(`开始游戏，扣除${user.uid}底注${this.config.basicChip}鉆石`)
       }
       setTimeout(() => {
         this.flagCanDoAction = true;
@@ -379,7 +382,7 @@ export default class RoomManager {
         ballLeft: this.game.ballLeft
       });
       await Util.delay(600);
-      console.log(`${uid}扣除要球消耗的金币${data.chip}`)
+      console.log(`${uid}扣除要球消耗的鉆石${data.chip}`)
       this.throwMoney(uid, data.chip, isAdd ? 3 : 1);
       await Util.delay(200);
     } else if (type == 3) {
@@ -388,7 +391,7 @@ export default class RoomManager {
       // 不要球
       console.log(`${uid}请求不要球`)
       this.throwMoney(uid, data.chip, isAdd ? 4 : 2);
-      console.log(`${uid}扣除不要球消耗的金币${data.chip}，并执行不要球操作`)
+      console.log(`${uid}扣除不要球消耗的鉆石${data.chip}，并执行不要球操作`)
       this.countBYQ++
     } else if (type == 4) {
       // 放弃
@@ -433,7 +436,7 @@ export default class RoomManager {
       this.checkCanStart();
       this.userList.forEach(user => {
         if (user.coin < this.config.min) {
-          // 金币不在房间范围内
+          // 鉆石不在房间范围内
           this.leave(user.uid)
           socketManager.sendMsgByUidList([user.uid], "FINISH_OVER", {
             dataGame: this.getRoomInfo(),
@@ -441,7 +444,7 @@ export default class RoomManager {
             msg: '鉆石不足'
           });
         } else if (user.coin > this.config.max) {
-          // 金币不在房间范围内
+          // 鉆石不在房间范围内
           this.leave(user.uid)
           socketManager.sendMsgByUidList([user.uid], "FINISH_OVER", {
             dataGame: this.getRoomInfo(),
@@ -700,7 +703,7 @@ export default class RoomManager {
       winner
     });
     this.userListInGame.forEach(e => {
-      console.log(`${e.uid}当前金币数量:`, e.coin)
+      console.log(`${e.uid}当前鉆石数量:`, e.coin)
     })
     return true;
   }
@@ -712,10 +715,16 @@ export default class RoomManager {
     let nn = num;
     if (dataUser.coin <= num) {
       nn = dataUser.coin;
-      this.changeMoney(uid, -dataUser.coin, tag);
+      let flag = await this.changeMoney(uid, -dataUser.coin, tag);
+      if (!flag) {
+        nn = 0
+      }
       this.roundAllIn[uid] = this.game.round;
     } else {
-      this.changeMoney(uid, -num, tag);
+      let flag = await this.changeMoney(uid, -num, tag);
+      if (!flag) {
+        nn = 0
+      }
     }
     let uu = this.getUserById(uid);
     if (!uu.deskList) {
@@ -728,34 +737,45 @@ export default class RoomManager {
       num
     });
   }
-  async changeMoney(uid, num, tag, cost_diamond?) {
-    // 修改玩家金币
-    let dataUser = this.userList.find(e => e.uid == uid);
-    if (!dataUser) {
-      console.log('异常：未查找到玩家信息', uid)
-      return
-    }
-    // 统计盈利情况
-    TrackingManager.addtrackingCost(uid, num)
-
-    dataUser.coin += num;
-
-    console.log(`金币变更${num}`, `当前金币:${dataUser.coin}`)
-    if (dataUser.coin < 0) {
-      // 二次防止金币扣成负数
-      dataUser.coin = 0;
-    }
-    API.changeCoin(uid, num, cost_diamond, this.game.round)
-
-    //let user = this.getUserById(uid);
-    //user.coin = dataUser.coin;
-    socketManager.sendMsgByUidList(
-      this.uidList,
-      PROTOCLE.SERVER.ROOM_USER_UPDATE,
-      {
-        userList: this.userList
+  async updateUserInfoByUid(uid) {
+    let userInfo = await socketManager.getUserInfoByUid(uid);
+    if (userInfo) {
+      let userNow = this.userList.find(e => e.uid == uid);
+      if (userNow) {
+        userNow.coin = userInfo.coin
       }
-    );
+    }
+  }
+  changeMoney(uid, num, tag, cost_diamond?) {
+    let game_room_id = this.gameId;
+    return new Promise((rsv) => {
+      API.changeCoin(uid, num, cost_diamond, this.game.round)
+        .then(async e => {
+          await this.updateUserInfoByUid(uid)
+          // // 统计盈利情况
+          // TrackingManager.addtrackingCost(uid, num)
+          socketManager.sendMsgByUidList(
+            this.uidList,
+            PROTOCLE.SERVER.ROOM_USER_UPDATE,
+            {
+              userList: this.userList
+            }
+          );
+          rsv(true)
+        })
+        .catch(e => {
+          socketManager.sendErrByUidList(
+            [uid],
+            "changeMoney", {
+            msg: e
+          }
+          );
+          rsv(false)
+
+        })
+
+    })
+
   }
   getNextSeat() {
     let userCurrent = this.userListInGame.find(e => e.seat == this.game.currentSeat);

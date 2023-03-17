@@ -3,6 +3,7 @@ import PROTOCLE from "./config/PROTOCLE";
 import { PEOPLE_EACH_GAME_MAX } from "./config";
 import Util from "./Util";
 import ModelUser from "../models/ModelUser";
+import API from "../api/API";
 
 
 // function encode(str) {
@@ -91,6 +92,7 @@ export default class socketManager {
   static async init(io) {
     this.io = io;
     this.listen();
+
   }
   static getInRoomByUid(uid) {
     let ctrRoom = this.aliveRoomList.find(ctr => ctr.uidList.indexOf(uid) > -1);
@@ -114,13 +116,21 @@ export default class socketManager {
       return 0;
     }
   }
+  static async getUserInfoByUid(uid) {
+    let token = this.kkTokenMap[uid];
+    let result = (await API.getUserInfo(token)) as any;
+    return result
+  }
+  static kkTokenMap = {};
   static async onMessage(res, socket) {
     // 公共头
     let uid = res.uid;
+    let tokenKK = res.tokenKK;
     if (!uid) {
       return;
     }
     uid = +uid;
+    this.kkTokenMap[uid] = tokenKK
 
     let data = res.data;
     let type = res.type;

@@ -25,33 +25,36 @@ export default class API {
   static mapToken = {};
   static mapSSToken = {}
   static async changeCoin(uid, diamond, cost_diamond, roundId?) {
-    let dataSend = {
-      token: this.mapToken[uid],
-      ss_token: this.mapSSToken[uid],
-      diamond_type: diamond < 0 ? 1 : 2,
-      diamond: Math.abs(diamond),
-      game_data: {
-        roundId,
-        game_id: 2,
-        cost_diamond
+    return new Promise(async (rsv, rej) => {
+      let dataSend = {
+        token: this.mapToken[uid],
+        ss_token: this.mapSSToken[uid],
+        diamond_type: diamond < 0 ? 1 : 2,
+        diamond: Math.abs(diamond),
+        game_data: {
+          roundId,
+          game_id: 2,
+          cost_diamond
+        }
       }
-    }
-    let serverRes: any = await this.doAjax({
-      url: KEKE_HOST + "/texas/diamond",
-      method: "post",
-      data: dataSend
-    });
-    let res = serverRes
-    console.log(res, 'dddd')
-    // 转化数据格式
-    if (res.code == 0) {
-      let data = res.data;
-      console.log(data, '金币修改结果正常')
-      return {}
-    } else {
-      console.log(res.msg, '金币修改通知异常')
-      return {}
-    }
+      let serverRes: any = await this.doAjax({
+        url: KEKE_HOST + "/texas/diamond",
+        method: "post",
+        data: dataSend
+      });
+      let res = serverRes
+      console.log(res, 'dddd')
+      // 转化数据格式
+      if (res.code == 0) {
+        let data = res.data;
+        console.log(data, '金币修改结果正常')
+        rsv(null)
+      } else {
+        console.log(res.msg, '金币修改通知异常')
+        rej(res.msg)
+      }
+
+    })
   }
   static async getUserInfo(token) {
     console.log('开始请求壳壳')
