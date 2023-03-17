@@ -12,6 +12,7 @@ export default class RoomManager {
   // 房间等级
   level = 1;
   roomId = 0;
+  roomIdUniq = '';
   isPublic = true;
   // 0匹配阶段 1开始游戏 2倒计时开始  10结算
   step = 0;
@@ -44,6 +45,7 @@ export default class RoomManager {
 
   constructor({ level }) {
     this.roomId = Util.getUniqId();
+    this.roomIdUniq = uuid.v4()
     this.level = level;
 
     this.step = 0;
@@ -747,7 +749,7 @@ export default class RoomManager {
     }
   }
   changeMoney(uid, num, tag, cost_diamond?) {
-    let game_room_id = this.roomId
+    let game_room_id = this.roomIdUniq
     let game_round_id = this.gameId;
     return new Promise((rsv) => {
       API.changeCoin(uid, num, cost_diamond, this.game.round, game_room_id, game_round_id)
