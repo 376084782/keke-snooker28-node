@@ -347,7 +347,7 @@ export default class RoomManager {
       }
       // 加注
       this.game.chip = data.chip;
-      this.throwMoney(uid, data.chip, 3);
+      await this.throwMoney(uid, data.chip, 3);
     } else if (type == 2) {
       let isAdd = data.chip > this.game.chip
       this.game.chip = data.chip;
@@ -389,14 +389,14 @@ export default class RoomManager {
       });
       await Util.delay(600);
       console.log(`${uid}扣除要球消耗的鉆石${data.chip}`)
-      this.throwMoney(uid, data.chip, isAdd ? 3 : 1);
+      await this.throwMoney(uid, data.chip, isAdd ? 3 : 1);
       await Util.delay(200);
     } else if (type == 3) {
       let isAdd = data.chip > this.game.chip
       this.game.chip = data.chip;
       // 不要球
       console.log(`${uid}请求不要球`)
-      this.throwMoney(uid, data.chip, isAdd ? 4 : 2);
+      await this.throwMoney(uid, data.chip, isAdd ? 4 : 2);
       console.log(`${uid}扣除不要球消耗的鉆石${data.chip}，并执行不要球操作`)
       this.countBYQ++
     } else if (type == 4) {
