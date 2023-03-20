@@ -119,6 +119,9 @@ export default class RoomManager {
   }
   // 玩家准备
   async doReady(uid) {
+    if (this.step != 0) {
+      return
+    }
     let userInfo = this.getUserById(uid);
     userInfo.isReady = true;
     socketManager.sendMsgByUidList(
@@ -705,7 +708,7 @@ export default class RoomManager {
     for (let uu in winner.mapGain) {
       let cc = winner.mapGain[uu]
       winner.mapGain[uu] = Math.floor(cc * p)
-      this.changeMoney(uu, winner.mapGain[uu], 10000, cc);
+      await this.changeMoney(uu, winner.mapGain[uu], 10000, cc);
     }
     console.log(chipTotalInDesk, winner.mapGain, 'winner.mapGain')
     socketManager.sendMsgByUidList(this.uidListLastRound, "FINISH", {
@@ -740,7 +743,7 @@ export default class RoomManager {
       uu.deskList = [];
     }
     uu.deskList.push(nn);
-    this.game.deskList.push(num);
+    this.game.deskList.push(nn);
     socketManager.sendMsgByUidList(this.uidList, "THROW_MONEY", {
       uid,
       num
