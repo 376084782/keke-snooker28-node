@@ -2,7 +2,7 @@ import API from "../api/API";
 import ModelConfigRoom from "../models/ModelConfigRoom";
 import ModelUser from "../models/ModelUser";
 import socketManager from "../socket";
-import TrackingManager from "../socket/controller/TrackingManager";
+// import TrackingManager from "../socket/controller/TrackingManager";
 import SocketServer from "../socket/SocketServer";
 import axios from "axios";
 import ConfigReader from "../config/ConfigReader";
@@ -26,7 +26,7 @@ router.post("/userinfo", async (req, res, next) => {
     let result = (await API.getUserInfo(data.token)) as any;
     res.send({ code: 0, data: result });
   } catch (e) {
-    console.warn('壳壳登陆接口错误')
+    console.log('/userinfo接口请求catch', e)
     res.send({ code: -1, msg: '壳壳登陆接口错误' });
   }
 });
@@ -48,18 +48,18 @@ router.post("/login", async function (req, res, next) {
   }
 });
 
-router.get("/user/track", async (req, res, next) => {
-  let data = req.query;
-  await TrackingManager.checkClearGain(data.uid);
-  let userInfo: any = await ModelUser.findOne({ uid: data.uid });
-  if (!userInfo) {
-    await ModelUser.create({ uid: data.uid });
-  }
-  res.send({
-    code: 0,
-    data: userInfo
-  });
-});
+// router.get("/user/track", async (req, res, next) => {
+//   let data = req.query;
+//   await TrackingManager.checkClearGain(data.uid);
+//   let userInfo: any = await ModelUser.findOne({ uid: data.uid });
+//   if (!userInfo) {
+//     await ModelUser.create({ uid: data.uid });
+//   }
+//   res.send({
+//     code: 0,
+//     data: userInfo
+//   });
+// });
 
 router.post("/hall/check_in_game", async (req, res, next) => {
   let data = req.body;

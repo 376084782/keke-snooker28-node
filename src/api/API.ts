@@ -86,8 +86,8 @@ export default class API {
       } else {
         return Promise.reject(res.msg)
       }
-
     } catch (e) {
+      console.log('getUserInfo catch', e)
       return Promise.reject('壳壳接口错误')
     }
   }

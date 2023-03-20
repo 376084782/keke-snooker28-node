@@ -3,7 +3,7 @@ import socketManager from "..";
 import _ from "lodash";
 import PROTOCLE from "../config/PROTOCLE";
 import ModelConfigRoom from "../../models/ModelConfigRoom";
-import TrackingManager from "./TrackingManager";
+// import TrackingManager from "./TrackingManager";
 import ModelUser from "../../models/ModelUser";
 import API from "../../api/API";
 import uuid = require('node-uuid')
@@ -137,55 +137,59 @@ export default class RoomManager {
   timerJoin = {};
   // 玩家加入
   async join(userInfo) {
-    // v2: 每次进⼊房间 更新服务端初始化拉取最新钻⽯剩余
-    let userInfoNew = await socketManager.getUserInfoByUid(userInfo.uid)
-    userInfo.coin = userInfoNew.coin;
-    await this.initConfig();
-    if (userInfo.coin > this.config.max) {
-      console.log(`${userInfo.uid}鉆石大于该房间上限，无法加入`)
-      socketManager.sendErrByUidList([userInfo.uid], "match", {
-        msg: "鉆石大於該房間上限"
-      });
-      return;
-    }
-    if (userInfo.coin < this.config.min) {
-      console.log(`${userInfo.uid}鉆石不足，无法加入`)
-      socketManager.sendErrByUidList([userInfo.uid], "match", {
-        msg: "鉆石不足"
-      });
-      return;
-    }
-    if (this.uidList.indexOf(userInfo.uid) > -1) {
-      console.log(`${userInfo.uid}已经在房间里，无法重复加入`)
-      socketManager.sendErrByUidList([userInfo.uid], "match", {
-        msg: "玩家已經在房間內"
-      });
-      return;
-    } else {
-      let blankSeat = this.getBlankSeat();
-      if (blankSeat == 0) {
-        console.log(`房间已满员，${userInfo.uid}无法加入`)
+    try {
+      // v2: 每次进⼊房间 更新服务端初始化拉取最新钻⽯剩余
+      let userInfoNew = await socketManager.getUserInfoByUid(userInfo.uid)
+      userInfo.coin = userInfoNew.coin;
+      await this.initConfig();
+      if (userInfo.coin > this.config.max) {
+        console.log(`${userInfo.uid}鉆石大于该房间上限，无法加入`)
         socketManager.sendErrByUidList([userInfo.uid], "match", {
-          msg: "房間已滿"
+          msg: "鉆石大於該房間上限"
         });
         return;
       }
-      userInfo.seat = blankSeat;
-      this.userList.push(userInfo);
-    }
-    this.userList = this.userList.sort((a: any, b: any) => a.seat - b.seat)
-    this.checkCanStart();
-
-    socketManager.sendMsgByUidList(
-      this.uidList,
-      PROTOCLE.SERVER.ROOM_USER_UPDATE,
-      {
-        userList: this.userList
+      if (userInfo.coin < this.config.min) {
+        console.log(`${userInfo.uid}鉆石不足，无法加入`)
+        socketManager.sendErrByUidList([userInfo.uid], "match", {
+          msg: "鉆石不足"
+        });
+        return;
       }
-    );
-    socketManager.sendMsgByUidList([userInfo.uid], PROTOCLE.SERVER.GO_GAME, {
-      dataGame: this.getRoomInfo()
-    });
+      if (this.uidList.indexOf(userInfo.uid) > -1) {
+        console.log(`${userInfo.uid}已经在房间里，无法重复加入`)
+        socketManager.sendErrByUidList([userInfo.uid], "match", {
+          msg: "玩家已經在房間內"
+        });
+        return;
+      } else {
+        let blankSeat = this.getBlankSeat();
+        if (blankSeat == 0) {
+          console.log(`房间已满员，${userInfo.uid}无法加入`)
+          socketManager.sendErrByUidList([userInfo.uid], "match", {
+            msg: "房間已滿"
+          });
+          return;
+        }
+        userInfo.seat = blankSeat;
+        this.userList.push(userInfo);
+      }
+      this.userList = this.userList.sort((a: any, b: any) => a.seat - b.seat)
+      this.checkCanStart();
+
+      socketManager.sendMsgByUidList(
+        this.uidList,
+        PROTOCLE.SERVER.ROOM_USER_UPDATE,
+        {
+          userList: this.userList
+        }
+      );
+      socketManager.sendMsgByUidList([userInfo.uid], PROTOCLE.SERVER.GO_GAME, {
+        dataGame: this.getRoomInfo()
+      });
+    } catch (e) {
+      console.log('join方法错误', e)
+    }
   }
   getBlankSeat() {
     for (let i = 1; i < 4; i++) {
@@ -375,7 +379,7 @@ export default class RoomManager {
       let sum = Util.sum(user.ballList)
       if (sum == 28) {
         // 正好达到28点，计数
-        TrackingManager.addtracking28(user.uid)
+        // TrackingManager.addtracking28(user.uid)
       }
       socketManager.sendMsgByUidList(this.uidList, "GET_BALL", {
         ball,
@@ -740,12 +744,16 @@ export default class RoomManager {
     });
   }
   async updateUserInfoByUid(uid) {
-    let userInfo = await socketManager.getUserInfoByUid(uid);
-    if (userInfo) {
-      let userNow = this.userList.find(e => e.uid == uid);
-      if (userNow) {
-        userNow.coin = userInfo.coin
+    try {
+      let userInfo = await socketManager.getUserInfoByUid(uid);
+      if (userInfo) {
+        let userNow = this.userList.find(e => e.uid == uid);
+        if (userNow) {
+          userNow.coin = userInfo.coin
+        }
       }
+    } catch (e) {
+      console.log('updateUserInfoByUid错误', e)
     }
   }
   changeMoney(uid, num, tag, cost_diamond?) {

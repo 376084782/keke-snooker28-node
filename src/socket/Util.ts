@@ -1,11 +1,13 @@
 const http = require("http");
 export default class Util {
-  
+
   static sum(list) {
     let s = 0
-    list.forEach(n => {
-      s += n
-    });
+    if (list) {
+      list.forEach(n => {
+        s += n
+      });
+    }
     return s
   }
   static id = 1;
