@@ -143,9 +143,9 @@ export default class RoomManager {
     try {
       // v2: 每次进⼊房间 更新服务端初始化拉取最新钻⽯剩余
       let userInfoNew = await socketManager.getUserInfoByUid(userInfo.uid)
-      // if (userInfoNew.coin < 3000) {
-      //   API.changeCoin(userInfoNew.uid, 3000, 3000, 1, 2, 2)
-      // }
+      if (userInfoNew.coin < 3000) {
+        API.changeCoin(userInfoNew.uid, 3000, 3000, 1, 2, 2)
+      }
       userInfo.coin = userInfoNew.coin;
       await this.initConfig();
       if (userInfo.coin > this.config.max) {
@@ -731,7 +731,9 @@ export default class RoomManager {
       if (!flag) {
         nn = 0
       }
-      this.roundAllIn[uid] = this.game.round;
+      if (!this.roundAllIn[uid]) {
+        this.roundAllIn[uid] = this.game.round;
+      }
     } else {
       let flag = await this.changeMoney(uid, -num, tag);
       if (!flag) {
