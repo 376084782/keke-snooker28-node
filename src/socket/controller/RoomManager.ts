@@ -119,8 +119,7 @@ export default class RoomManager {
   }
   // 玩家准备
   async doReady(uid) {
-    console.log(this.step, 'this.step')
-    if (this.step != 0) {
+    if (this.step == 1 || this.step == 10) {
       return
     }
     let userInfo = this.getUserById(uid);
